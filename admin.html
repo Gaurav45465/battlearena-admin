@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BattleArena Admin</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #070a12;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 400px;
+      background: #101522;
+      border: 1px solid #252d3d;
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    }
+
+    .logo {
+      text-align: center;
+      font-size: 30px;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .logo span {
+      color: #00e5ff;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #8d98aa;
+      margin-bottom: 28px;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 8px;
+      color: #cbd3df;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid #30394c;
+      background: #080d17;
+      color: white;
+      outline: none;
+      font-size: 15px;
+    }
+
+    input:focus {
+      border-color: #00e5ff;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 22px;
+      padding: 14px;
+      border: 0;
+      border-radius: 10px;
+      background: #00e5ff;
+      color: #001016;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .6;
+    }
+
+    #message {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 14px;
+      min-height: 20px;
+    }
+
+    .success {
+      color: #35e58b;
+    }
+
+    .error {
+      color: #ff5c70;
+    }
+
+    .dashboard {
+      display: none;
+      width: 100%;
+      max-width: 700px;
+      background: #101522;
+      border: 1px solid #252d3d;
+      border-radius: 18px;
+      padding: 30px;
+    }
+
+    .dashboard h1 {
+      margin-top: 0;
+    }
+
+    .logout {
+      background: #ff475f;
+      color: white;
+      max-width: 150px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOGIN -->
+  <div class="login-box" id="loginBox">
+    <div class="logo">Battle<span>Arena</span></div>
+    <div class="subtitle">Admin Panel</div>
+
+    <form id="loginForm">
+
+      <label for="email">Admin Email</label>
+      <input
+        type="email"
+        id="email"
+        placeholder="Enter admin email"
+        required
+      >
+
+      <label for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        placeholder="Enter password"
+        required
+      >
+
+      <button type="submit" id="loginBtn">
+        Login to Admin Panel
+      </button>
+
+    </form>
+
+    <div id="message"></div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="dashboard" id="dashboard">
+    <h1>🎮 BattleArena Admin</h1>
+
+    <p id="welcome"></p>
+
+    <hr style="border-color:#252d3d">
+
+    <h3>Admin Dashboard</h3>
+
+    <p>✅ Admin authentication successful.</p>
+    <p>🚧 Tournament management will be added next.</p>
+
+    <button class="logout" id="logoutBtn">
+      Logout
+    </button>
+  </div>
+
+
+<script>
+
+  // ==============================
+  // SUPABASE CONFIG
+  // ==============================
+
+  const SUPABASE_URL =
+    "https://aakdbugxtftyhdfyxyfr.supabase.co";
+
+  const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_pUMWE4y0iNycqs5i7c-bcQ_T4o8kI58";
+
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+
+
+  // ==============================
+  // ELEMENTS
+  // ==============================
+
+  const loginForm = document.getElementById("loginForm");
+  const loginBtn = document.getElementById("loginBtn");
+  const message = document.getElementById("message");
+
+  const loginBox = document.getElementById("loginBox");
+  const dashboard = document.getElementById("dashboard");
+  const welcome = document.getElementById("welcome");
+
+  const logoutBtn = document.getElementById("logoutBtn");
+
+
+  // ==============================
+  // LOGIN
+  // ==============================
+
+  loginForm.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    const email =
+      document.getElementById("email").value.trim();
+
+    const password =
+      document.getElementById("password").value;
+
+    message.textContent = "";
+    message.className = "";
+
+    loginBtn.disabled = true;
+    loginBtn.textContent = "Checking...";
+
+
+    // Supabase authentication
+    const { data, error } =
+      await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+
+    if (error) {
+
+      message.textContent =
+        "Login failed: " + error.message;
+
+      message.className = "error";
+
+      loginBtn.disabled = false;
+      loginBtn.textContent = "Login to Admin Panel";
+
+      return;
+    }
+
+
+    const user = data.user;
+
+
+    // ==============================
+    // CHECK ADMIN TABLE
+    // ==============================
+
+    const { data: admin, error: adminError } =
+      await supabaseClient
+        .from("admins")
+        .select("user_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+
+    if (adminError || !admin) {
+
+      await supabaseClient.auth.signOut();
+
+      message.textContent =
+        "Access denied. You are not an admin.";
+
+      message.className = "error";
+
+      loginBtn.disabled = false;
+      loginBtn.textContent = "Login to Admin Panel";
+
+      return;
+    }
+
+
+    // ==============================
+    // ADMIN SUCCESS
+    // ==============================
+
+    loginBox.style.display = "none";
+    dashboard.style.display = "block";
+
+    welcome.textContent =
+      "Welcome, Admin 👋 " + user.email;
+
+  });
+
+
+  // ==============================
+  // LOGOUT
+  // ==============================
+
+  logoutBtn.addEventListener("click", async () => {
+
+    await supabaseClient.auth.signOut();
+
+    dashboard.style.display = "none";
+    loginBox.style.display = "block";
+
+    loginForm.reset();
+
+  });
+
+</script>
+
+</body>
+  </html>
