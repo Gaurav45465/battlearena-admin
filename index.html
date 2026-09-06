@@ -1,90 +1,321 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BattleArena Admin</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>BattleArena Admin Panel</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: #070a12;
-      color: white;
-      font-family: Arial, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+<style>
+*{
+  box-sizing:border-box;
+}
 
-    .login-box {
-      width: 90%;
-      max-width: 400px;
-      background: #111827;
-      padding: 30px;
-      border-radius: 18px;
-      box-shadow: 0 15px 50px rgba(0,0,0,.5);
-    }
+body{
+  margin:0;
+  background:#070a12;
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+}
 
-    h1 {
-      text-align: center;
-      margin-bottom: 8px;
-    }
+/* LOGIN */
 
-    .sub {
-      text-align: center;
-      color: #9ca3af;
-      margin-bottom: 25px;
-    }
+.login-page{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
 
-    input {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 15px;
-      border: 1px solid #374151;
-      border-radius: 10px;
-      background: #0b1220;
-      color: white;
-      font-size: 15px;
-      outline: none;
-    }
+.login-box{
+  width:100%;
+  max-width:400px;
+  background:#111827;
+  padding:30px;
+  border-radius:18px;
+  box-shadow:0 15px 50px rgba(0,0,0,.5);
+}
 
-    button {
-      width: 100%;
-      padding: 14px;
-      border: 0;
-      border-radius: 10px;
-      background: #2563eb;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.login-box h1{
+  text-align:center;
+  margin:0 0 8px;
+}
 
-    button:disabled {
-      opacity: .6;
-    }
+.login-sub{
+  text-align:center;
+  color:#9ca3af;
+  margin-bottom:25px;
+}
 
-    #message {
-      margin-top: 15px;
-      text-align: center;
-      color: #f87171;
-      min-height: 20px;
-    }
-  </style>
+input,select,textarea{
+  width:100%;
+  padding:13px;
+  margin-bottom:14px;
+  border:1px solid #374151;
+  border-radius:10px;
+  background:#0b1220;
+  color:#fff;
+  outline:none;
+}
+
+textarea{
+  min-height:100px;
+  resize:vertical;
+}
+
+button{
+  border:0;
+  border-radius:10px;
+  padding:12px 16px;
+  background:#2563eb;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover{
+  opacity:.9;
+}
+
+button.danger{
+  background:#dc2626;
+}
+
+#loginMessage{
+  min-height:20px;
+  text-align:center;
+  margin-top:15px;
+  color:#f87171;
+}
+
+/* ADMIN */
+
+.admin{
+  display:none;
+  min-height:100vh;
+}
+
+.sidebar{
+  position:fixed;
+  left:0;
+  top:0;
+  width:250px;
+  height:100vh;
+  background:#0d1320;
+  border-right:1px solid #1f2937;
+  padding:20px 15px;
+  z-index:100;
+}
+
+.logo{
+  font-size:22px;
+  font-weight:bold;
+  padding:10px;
+  margin-bottom:25px;
+}
+
+.logo span{
+  color:#3b82f6;
+}
+
+.nav-btn{
+  width:100%;
+  display:block;
+  text-align:left;
+  background:transparent;
+  margin-bottom:7px;
+  color:#d1d5db;
+}
+
+.nav-btn:hover,
+.nav-btn.active{
+  background:#1d4ed8;
+  color:#fff;
+}
+
+.logout{
+  position:absolute;
+  bottom:20px;
+  left:15px;
+  width:calc(100% - 30px);
+  background:#dc2626;
+}
+
+/* CONTENT */
+
+.main{
+  margin-left:250px;
+  padding:25px;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  margin-bottom:25px;
+}
+
+.topbar h1{
+  margin:0;
+}
+
+.mobile-menu{
+  display:none;
+}
+
+/* PAGES */
+
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+}
+
+/* CARDS */
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+  margin-bottom:25px;
+}
+
+.stat-card{
+  background:#111827;
+  border:1px solid #1f2937;
+  padding:20px;
+  border-radius:15px;
+}
+
+.stat-card .title{
+  color:#9ca3af;
+  font-size:14px;
+}
+
+.stat-card .number{
+  font-size:30px;
+  font-weight:bold;
+  margin-top:8px;
+}
+
+/* PANEL */
+
+.panel{
+  background:#111827;
+  border:1px solid #1f2937;
+  border-radius:15px;
+  padding:20px;
+  margin-bottom:20px;
+}
+
+.panel h2{
+  margin-top:0;
+}
+
+/* TABLE */
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:650px;
+}
+
+th,td{
+  padding:13px 10px;
+  border-bottom:1px solid #273244;
+  text-align:left;
+}
+
+th{
+  color:#9ca3af;
+  font-size:13px;
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  background:#1d4ed8;
+  font-size:12px;
+}
+
+.empty{
+  color:#9ca3af;
+  padding:20px 0;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:800px){
+
+  .sidebar{
+    transform:translateX(-100%);
+    transition:.25s;
+  }
+
+  .sidebar.open{
+    transform:translateX(0);
+  }
+
+  .main{
+    margin-left:0;
+    padding:18px;
+  }
+
+  .mobile-menu{
+    display:block;
+  }
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:500px){
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+
+  .stat-card{
+    padding:15px;
+  }
+
+  .stat-card .number{
+    font-size:24px;
+  }
+
+  .topbar h1{
+    font-size:21px;
+  }
+}
+</style>
 </head>
 
 <body>
 
+<!-- LOGIN -->
+
+<div class="login-page" id="loginPage">
+
   <div class="login-box">
+
     <h1>🎮 BattleArena</h1>
-    <div class="sub">Admin Panel</div>
+
+    <div class="login-sub">
+      Admin Panel
+    </div>
 
     <input
       type="email"
@@ -100,133 +331,567 @@
       autocomplete="current-password"
     >
 
-    <button id="loginBtn" onclick="login()">
+    <button
+      id="loginBtn"
+      onclick="login()"
+      style="width:100%;"
+    >
       LOGIN
     </button>
 
-    <div id="message"></div>
+    <div id="loginMessage"></div>
+
   </div>
 
-<script>
-  const SUPABASE_URL = "https://aakdbugxtftyhdfyxyfr.supabase.co";
+</div>
 
-  const SUPABASE_KEY =
-    "sb_publishable_pUMWE4y0iNycqs5i7c-bcQ_T4o8kI58";
 
-  const supabaseClient =
-    window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
+<!-- ADMIN PANEL -->
 
-  async function login() {
+<div class="admin" id="adminPanel">
 
-    const email =
-      document.getElementById("email").value.trim();
+  <!-- SIDEBAR -->
 
-    const password =
-      document.getElementById("password").value;
+  <aside class="sidebar" id="sidebar">
 
-    const message =
-      document.getElementById("message");
+    <div class="logo">
+      🎮 <span>BattleArena</span>
+    </div>
 
-    const button =
-      document.getElementById("loginBtn");
+    <button class="nav-btn active" onclick="openPage('dashboard',this)">
+      📊 Dashboard
+    </button>
 
-    message.textContent = "";
+    <button class="nav-btn" onclick="openPage('tournaments',this)">
+      🏆 Tournaments
+    </button>
 
-    if (!email || !password) {
-      message.textContent =
-        "Email aur password dono bharo.";
-      return;
-    }
+    <button class="nav-btn" onclick="openPage('players',this)">
+      👥 Players
+    </button>
 
-    button.disabled = true;
-    button.textContent = "LOGGING IN...";
+    <button class="nav-btn" onclick="openPage('rooms',this)">
+      🚪 Rooms
+    </button>
 
-    try {
+    <button class="nav-btn" onclick="openPage('results',this)">
+      🥇 Results
+    </button>
 
-      const { data, error } =
-        await supabaseClient.auth.signInWithPassword({
-          email: email,
-          password: password
-        });
+    <button class="nav-btn" onclick="openPage('ads',this)">
+      📢 Ads
+    </button>
 
-      if (error) {
-        throw error;
-      }
+    <button class="nav-btn" onclick="openPage('settings',this)">
+      ⚙️ Settings
+    </button>
 
-      if (!data.user) {
-        throw new Error("Login failed.");
-      }
+    <button
+      class="nav-btn logout"
+      onclick="logout()"
+    >
+      🚪 Logout
+    </button>
 
-      const { data: admin, error: adminError } =
-        await supabaseClient
-          .from("admins")
-          .select("user_id")
-          .eq("user_id", data.user.id)
-          .maybeSingle();
+  </aside>
 
-      if (adminError) {
-        await supabaseClient.auth.signOut();
-        throw adminError;
-      }
 
-      if (!admin) {
-        await supabaseClient.auth.signOut();
-        throw new Error(
-          "Ye account admin nahi hai."
-        );
-      }
+  <!-- MAIN -->
 
-      message.style.color = "#4ade80";
-      message.textContent =
-        "Login successful!";
+  <main class="main">
 
-      setTimeout(() => {
-        showDashboard();
-      }, 500);
+    <div class="topbar">
 
-    } catch (error) {
+      <div>
+        <button
+          class="mobile-menu"
+          onclick="toggleSidebar()"
+        >
+          ☰
+        </button>
 
-      console.error(error);
-
-      message.style.color = "#f87171";
-      message.textContent =
-        error.message || "Login failed.";
-
-      button.disabled = false;
-      button.textContent = "LOGIN";
-    }
-  }
-
-  function showDashboard() {
-
-    document.body.innerHTML = `
-      <div style="
-        width:100%;
-        min-height:100vh;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        background:#070a12;
-        color:white;
-        font-family:Arial;
-        text-align:center;
-        padding:20px;
-      ">
-        <div>
-          <h1>🎉 Login Successful</h1>
-          <p style="color:#9ca3af;">
-            BattleArena Admin Panel connected successfully.
-          </p>
-          <p>
-            Next step mein complete Dashboard add karenge.
-          </p>
-        </div>
+        <h1 id="pageTitle">Dashboard</h1>
       </div>
-    `;
+
+      <div id="adminEmail"
+           style="color:#9ca3af;font-size:13px;">
+      </div>
+
+    </div>
+
+
+    <!-- DASHBOARD -->
+
+    <section class="page active" id="dashboard">
+
+      <div class="stats">
+
+        <div class="stat-card">
+          <div class="title">Tournaments</div>
+          <div class="number" id="totalTournaments">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="title">Players</div>
+          <div class="number" id="totalPlayers">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="title">Upcoming</div>
+          <div class="number" id="upcomingCount">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="title">Live</div>
+          <div class="number" id="liveCount">0</div>
+        </div>
+
+      </div>
+
+
+      <div class="panel">
+
+        <h2>🔥 BattleArena Admin</h2>
+
+        <p style="color:#9ca3af;">
+          Welcome to your tournament control panel.
+        </p>
+
+        <p>
+          यहां से आगे हम आपकी public BattleArena website
+          के tournaments, players, rooms, results, ads और
+          settings को control करेंगे।
+        </p>
+
+      </div>
+
+
+      <div class="panel">
+
+        <h2>📌 System Status</h2>
+
+        <p id="connectionStatus">
+          Checking Supabase connection...
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- TOURNAMENTS -->
+
+    <section class="page" id="tournaments">
+
+      <div class="panel">
+
+        <h2>🏆 Tournaments</h2>
+
+        <p style="color:#9ca3af;">
+          Tournament management Step 3 में add करेंगे।
+        </p>
+
+        <button onclick="alert('Tournament manager Step 3 में activate होगा.')">
+          + Add Tournament
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- PLAYERS -->
+
+    <section class="page" id="players">
+
+      <div class="panel">
+
+        <h2>👥 Players</h2>
+
+        <p style="color:#9ca3af;">
+          Registered players यहां दिखाई देंगे।
+        </p>
+
+        <div id="playersPreview">
+          Loading...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ROOMS -->
+
+    <section class="page" id="rooms">
+
+      <div class="panel">
+
+        <h2>🚪 Room Management</h2>
+
+        <p style="color:#9ca3af;">
+          Room ID और Password management Step 4 में activate करेंगे।
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- RESULTS -->
+
+    <section class="page" id="results">
+
+      <div class="panel">
+
+        <h2>🥇 Results</h2>
+
+        <p style="color:#9ca3af;">
+          Winners और prize management Step 5 में activate करेंगे।
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- ADS -->
+
+    <section class="page" id="ads">
+
+      <div class="panel">
+
+        <h2>📢 Ads Management</h2>
+
+        <p style="color:#9ca3af;">
+          Popup ads, sponsor ads और YouTube subscription
+          controls Step 6 में activate करेंगे।
+        </p>
+
+        <button onclick="alert('Ads Manager Step 6 में activate होगा.')">
+          Open Ads Manager
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- SETTINGS -->
+
+    <section class="page" id="settings">
+
+      <div class="panel">
+
+        <h2>⚙️ Website Settings</h2>
+
+        <p style="color:#9ca3af;">
+          Website settings Step 7 में activate करेंगे।
+        </p>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+
+<script>
+
+const SUPABASE_URL =
+  "https://aakdbugxtftyhdfyxyfr.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_pUMWE4y0iNycqs5i7c-bcQ_T4o8kI58";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+/* LOGIN */
+
+async function login(){
+
+  const email =
+    document.getElementById("email")
+    .value.trim();
+
+  const password =
+    document.getElementById("password")
+    .value;
+
+  const message =
+    document.getElementById("loginMessage");
+
+  const button =
+    document.getElementById("loginBtn");
+
+  message.textContent = "";
+
+  if(!email || !password){
+
+    message.textContent =
+      "Email aur password dono bharo.";
+
+    return;
   }
+
+  button.disabled = true;
+  button.textContent = "LOGGING IN...";
+
+  try{
+
+    const {data,error} =
+      await supabaseClient.auth
+      .signInWithPassword({
+        email:email,
+        password:password
+      });
+
+    if(error) throw error;
+
+    if(!data.user)
+      throw new Error("Login failed.");
+
+    const {data:admin,error:adminError} =
+      await supabaseClient
+      .from("admins")
+      .select("user_id")
+      .eq("user_id",data.user.id)
+      .maybeSingle();
+
+    if(adminError)
+      throw adminError;
+
+    if(!admin){
+
+      await supabaseClient.auth.signOut();
+
+      throw new Error(
+        "Ye account admin nahi hai."
+      );
+    }
+
+    showAdmin(data.user);
+
+  }catch(error){
+
+    console.error(error);
+
+    message.textContent =
+      error.message || "Login failed.";
+
+    button.disabled = false;
+    button.textContent = "LOGIN";
+  }
+}
+
+
+/* SHOW ADMIN */
+
+function showAdmin(user){
+
+  document.getElementById("loginPage")
+    .style.display="none";
+
+  document.getElementById("adminPanel")
+    .style.display="block";
+
+  document.getElementById("adminEmail")
+    .textContent=user.email || "";
+
+  checkConnection();
+  loadStats();
+}
+
+
+/* PAGE NAVIGATION */
+
+function openPage(page,button){
+
+  document.querySelectorAll(".page")
+    .forEach(p=>{
+      p.classList.remove("active");
+    });
+
+  const target =
+    document.getElementById(page);
+
+  if(target)
+    target.classList.add("active");
+
+  document.querySelectorAll(".nav-btn")
+    .forEach(btn=>{
+      btn.classList.remove("active");
+    });
+
+  if(button)
+    button.classList.add("active");
+
+  const titles={
+    dashboard:"Dashboard",
+    tournaments:"Tournaments",
+    players:"Players",
+    rooms:"Rooms",
+    results:"Results",
+    ads:"Ads Management",
+    settings:"Website Settings"
+  };
+
+  document.getElementById("pageTitle")
+    .textContent=titles[page] || "Dashboard";
+
+  document.getElementById("sidebar")
+    .classList.remove("open");
+}
+
+
+/* MOBILE SIDEBAR */
+
+function toggleSidebar(){
+
+  document.getElementById("sidebar")
+    .classList.toggle("open");
+}
+
+
+/* LOGOUT */
+
+async function logout(){
+
+  await supabaseClient.auth.signOut();
+
+  location.reload();
+}
+
+
+/* CHECK CONNECTION */
+
+async function checkConnection(){
+
+  const status =
+    document.getElementById("connectionStatus");
+
+  try{
+
+    const {error} =
+      await supabaseClient
+      .from("tournaments")
+      .select("id")
+      .limit(1);
+
+    if(error) throw error;
+
+    status.innerHTML =
+      "🟢 Supabase Connected";
+
+    status.style.color="#4ade80";
+
+  }catch(error){
+
+    console.error(error);
+
+    status.innerHTML =
+      "🔴 Supabase connection error";
+
+    status.style.color="#f87171";
+  }
+}
+
+
+/* LOAD DASHBOARD STATS */
+
+async function loadStats(){
+
+  try{
+
+    const tournaments =
+      await supabaseClient
+      .from("tournaments")
+      .select("id,status");
+
+    if(!tournaments.error){
+
+      const rows =
+        tournaments.data || [];
+
+      document.getElementById(
+        "totalTournaments"
+      ).textContent=rows.length;
+
+      document.getElementById(
+        "upcomingCount"
+      ).textContent=
+        rows.filter(x=>x.status==="upcoming").length;
+
+      document.getElementById(
+        "liveCount"
+      ).textContent=
+        rows.filter(x=>x.status==="live").length;
+    }
+
+
+    const registrations =
+      await supabaseClient
+      .from("registrations")
+      .select("id");
+
+    if(!registrations.error){
+
+      document.getElementById(
+        "totalPlayers"
+      ).textContent=
+        (registrations.data || []).length;
+    }
+
+  }catch(error){
+
+    console.error(error);
+
+  }
+}
+
+
+/* AUTO LOGIN */
+
+async function checkSession(){
+
+  const {data} =
+    await supabaseClient.auth
+    .getSession();
+
+  if(data.session){
+
+    const user =
+      data.session.user;
+
+    const {data:admin} =
+      await supabaseClient
+      .from("admins")
+      .select("user_id")
+      .eq("user_id",user.id)
+      .maybeSingle();
+
+    if(admin){
+
+      showAdmin(user);
+
+    }else{
+
+      await supabaseClient.auth.signOut();
+
+    }
+  }
+}
+
+
+checkSession();
+
 </script>
 
 </body>
