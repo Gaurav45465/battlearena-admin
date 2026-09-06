@@ -1,149 +1,645 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BattleArena Admin</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BattleArena Admin</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<style>
+*{box-sizing:border-box}
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #070a12;
-      color: #fff;
-    }
+body{
+  margin:0;
+  font-family:Arial,Segoe UI,sans-serif;
+  background:#070a12;
+  color:#fff;
+}
 
-    .login-box {
-      width: min(420px, 92%);
-      margin: 80px auto;
-      padding: 30px;
-      background: #111827;
-      border: 1px solid #263248;
-      border-radius: 16px;
-    }
+button,input,select{
+  font:inherit;
+}
 
-    h1 {
-      margin-top: 0;
-    }
+button{
+  cursor:pointer;
+}
 
-    input, button {
-      width: 100%;
-      padding: 13px;
-      margin-top: 12px;
-      border-radius: 8px;
-      border: 1px solid #334155;
-      font-size: 15px;
-    }
+.login-box{
+  width:min(420px,92%);
+  margin:70px auto;
+  padding:30px;
+  background:#111827;
+  border:1px solid #263248;
+  border-radius:18px;
+}
 
-    input {
-      background: #0b1220;
-      color: white;
-    }
+.login-box h1{
+  margin-top:0;
+}
 
-    button {
-      background: #2563eb;
-      color: white;
-      border: 0;
-      font-weight: bold;
-      cursor: pointer;
-    }
+input,select{
+  width:100%;
+  padding:13px;
+  margin-top:10px;
+  border-radius:9px;
+  border:1px solid #334155;
+  background:#0b1220;
+  color:#fff;
+}
 
-    button:hover {
-      opacity: .9;
-    }
+.primary{
+  width:100%;
+  padding:13px;
+  margin-top:14px;
+  border:0;
+  border-radius:9px;
+  background:#2563eb;
+  color:#fff;
+  font-weight:bold;
+}
 
-    #dashboard {
-      display: none;
-      padding: 25px;
-    }
+.message{
+  margin-top:12px;
+  color:#fbbf24;
+}
 
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
+#dashboard{
+  display:none;
+}
 
-    .logout {
-      width: auto;
-      padding: 10px 18px;
-      background: #dc2626;
-    }
+.layout{
+  display:flex;
+  min-height:100vh;
+}
 
-    .status {
-      margin-top: 20px;
-      padding: 15px;
-      background: #0f172a;
-      border-radius: 10px;
-      border: 1px solid #263248;
-    }
-  </style>
+.sidebar{
+  width:230px;
+  background:#0d1320;
+  border-right:1px solid #263248;
+  padding:20px;
+  position:fixed;
+  left:0;
+  top:0;
+  bottom:0;
+}
+
+.logo{
+  font-size:21px;
+  font-weight:bold;
+  margin-bottom:30px;
+}
+
+.nav button{
+  width:100%;
+  text-align:left;
+  padding:13px;
+  margin-bottom:8px;
+  background:transparent;
+  color:#cbd5e1;
+  border:0;
+  border-radius:9px;
+}
+
+.nav button.active,
+.nav button:hover{
+  background:#1e293b;
+  color:#fff;
+}
+
+.main{
+  margin-left:230px;
+  width:calc(100% - 230px);
+  padding:24px;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  flex-wrap:wrap;
+  margin-bottom:25px;
+}
+
+.logout{
+  background:#dc2626;
+  color:white;
+  border:0;
+  border-radius:8px;
+  padding:10px 17px;
+}
+
+.section{
+  display:none;
+}
+
+.section.active{
+  display:block;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+  margin-bottom:25px;
+}
+
+.card{
+  background:#111827;
+  border:1px solid #263248;
+  border-radius:14px;
+  padding:18px;
+}
+
+.card .number{
+  font-size:30px;
+  font-weight:bold;
+  margin-top:8px;
+}
+
+.card .label{
+  color:#94a3b8;
+}
+
+.panel{
+  background:#111827;
+  border:1px solid #263248;
+  border-radius:14px;
+  padding:20px;
+  margin-bottom:20px;
+}
+
+.panel-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.add-btn{
+  background:#16a34a;
+  color:#fff;
+  border:0;
+  border-radius:8px;
+  padding:11px 16px;
+  font-weight:bold;
+}
+
+.table-wrap{
+  overflow-x:auto;
+  margin-top:15px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:850px;
+}
+
+th,td{
+  padding:12px;
+  text-align:left;
+  border-bottom:1px solid #263248;
+}
+
+th{
+  color:#94a3b8;
+  font-size:13px;
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 8px;
+  border-radius:20px;
+  font-size:12px;
+}
+
+.upcoming{background:#1d4ed8}
+.live{background:#dc2626}
+.completed{background:#475569}
+.cancelled{background:#7f1d1d}
+
+.action{
+  border:0;
+  border-radius:6px;
+  padding:7px 10px;
+  color:#fff;
+  margin-right:4px;
+}
+
+.edit{
+  background:#2563eb;
+}
+
+.delete{
+  background:#dc2626;
+}
+
+.close{
+  background:#475569;
+}
+
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  z-index:100;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.modal-box{
+  width:min(600px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:#111827;
+  border:1px solid #334155;
+  border-radius:16px;
+  padding:22px;
+}
+
+.modal-actions{
+  display:flex;
+  gap:10px;
+  margin-top:18px;
+}
+
+.modal-actions button{
+  flex:1;
+  padding:12px;
+  border:0;
+  border-radius:8px;
+  color:#fff;
+  font-weight:bold;
+}
+
+.save-btn{
+  background:#16a34a;
+}
+
+.cancel-btn{
+  background:#475569;
+}
+
+.empty{
+  text-align:center;
+  color:#94a3b8;
+  padding:25px;
+}
+
+@media(max-width:900px){
+  .sidebar{
+    width:70px;
+    padding:12px 8px;
+  }
+
+  .logo{
+    font-size:0;
+    text-align:center;
+  }
+
+  .logo:first-letter{
+    font-size:25px;
+  }
+
+  .nav button{
+    font-size:0;
+    text-align:center;
+  }
+
+  .nav button::first-letter{
+    font-size:20px;
+  }
+
+  .main{
+    margin-left:70px;
+    width:calc(100% - 70px);
+    padding:15px;
+  }
+
+  .cards{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:550px){
+  .cards{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .card{
+    padding:13px;
+  }
+
+  .card .number{
+    font-size:24px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <div class="login-box" id="loginBox">
-    <h1>🎮 BattleArena Admin</h1>
-    <p>Admin Login</p>
+<!-- LOGIN -->
+<div class="login-box" id="loginBox">
+  <h1>🎮 BattleArena Admin</h1>
+  <p>Secure Admin Login</p>
 
-    <input
-      type="email"
-      id="email"
-      placeholder="Admin Email"
-    >
+  <input id="email" type="email" placeholder="Admin Email">
+  <input id="password" type="password" placeholder="Password">
 
-    <input
-      type="password"
-      id="password"
-      placeholder="Password"
-    >
+  <button class="primary" onclick="login()">LOGIN</button>
 
-    <button onclick="login()">LOGIN</button>
+  <div class="message" id="loginMessage"></div>
+</div>
 
-    <div id="loginMessage"></div>
-  </div>
 
-  <div id="dashboard">
+<!-- DASHBOARD -->
+<div id="dashboard">
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="logo">🎮 BattleArena</div>
+
+    <div class="nav">
+      <button class="active" onclick="showSection('dashboardSection',this)">📊 Dashboard</button>
+      <button onclick="showSection('tournamentsSection',this)">🏆 Tournaments</button>
+      <button onclick="showSection('playersSection',this)">👥 Players</button>
+      <button onclick="showSection('roomsSection',this)">🔐 Rooms</button>
+      <button onclick="showSection('resultsSection',this)">🥇 Results</button>
+      <button onclick="showSection('settingsSection',this)">⚙️ Settings</button>
+    </div>
+  </aside>
+
+
+  <main class="main">
 
     <div class="topbar">
       <div>
-        <h1>BattleArena Admin Dashboard</h1>
-        <p id="welcome"></p>
+        <h1>Admin Dashboard</h1>
+        <div id="welcome"></div>
       </div>
 
       <button class="logout" onclick="logout()">Logout</button>
     </div>
 
-    <div class="status">
-      <h2>✅ Admin Panel Connected</h2>
-      <p>Supabase authentication is working.</p>
-      <p>Next we will add tournament management, players, rooms, results and website settings.</p>
+
+    <!-- DASHBOARD SECTION -->
+    <section class="section active" id="dashboardSection">
+
+      <div class="cards">
+
+        <div class="card">
+          <div class="label">Total Tournaments</div>
+          <div class="number" id="totalTournaments">0</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Registrations</div>
+          <div class="number" id="totalRegistrations">0</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Upcoming</div>
+          <div class="number" id="upcomingCount">0</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Live</div>
+          <div class="number" id="liveCount">0</div>
+        </div>
+
+      </div>
+
+      <div class="panel">
+        <h2>🏆 Recent Tournaments</h2>
+        <div id="recentTournaments"></div>
+      </div>
+
+    </section>
+
+
+    <!-- TOURNAMENT SECTION -->
+    <section class="section" id="tournamentsSection">
+
+      <div class="panel">
+
+        <div class="panel-head">
+          <h2>🏆 Tournament Management</h2>
+
+          <button class="add-btn" onclick="openTournamentModal()">
+            + Add Tournament
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Map</th>
+                <th>Type</th>
+                <th>Prize</th>
+                <th>Date/Time</th>
+                <th>Status</th>
+                <th>Registration</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody id="tournamentTable"></tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- PLAYERS -->
+    <section class="section" id="playersSection">
+
+      <div class="panel">
+        <h2>👥 Players / Registrations</h2>
+        <p style="color:#94a3b8">
+          Registered players will appear here.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>BGMI UID</th>
+                <th>Phone</th>
+                <th>Tournament</th>
+                <th>Status</th>
+                <th>Registered At</th>
+              </tr>
+            </thead>
+            <tbody id="playersTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ROOMS -->
+    <section class="section" id="roomsSection">
+
+      <div class="panel">
+        <h2>🔐 Room Management</h2>
+        <p style="color:#94a3b8">
+          Room ID और Password tournament edit करके manage कर सकते हैं।
+        </p>
+      </div>
+
+    </section>
+
+
+    <!-- RESULTS -->
+    <section class="section" id="resultsSection">
+
+      <div class="panel">
+        <h2>🥇 Results Management</h2>
+        <p style="color:#94a3b8">
+          Results management अगले step में activate करेंगे।
+        </p>
+      </div>
+
+    </section>
+
+
+    <!-- SETTINGS -->
+    <section class="section" id="settingsSection">
+
+      <div class="panel">
+        <h2>⚙️ Website Settings</h2>
+        <p style="color:#94a3b8">
+          YouTube, WhatsApp, sponsor और announcement settings अगले step में जोड़ेंगे।
+        </p>
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+</div>
+
+
+<!-- TOURNAMENT MODAL -->
+<div class="modal" id="tournamentModal">
+
+  <div class="modal-box">
+
+    <h2 id="modalTitle">Add Tournament</h2>
+
+    <input type="hidden" id="tournamentId">
+
+    <label>Name</label>
+    <input id="tName" placeholder="Erangel Solo Match">
+
+    <label>Map</label>
+    <select id="tMap">
+      <option>Erangel</option>
+      <option>Livik</option>
+      <option>Miramar</option>
+      <option>Sanhok</option>
+      <option>Vikendi</option>
+    </select>
+
+    <label>Match Type</label>
+    <select id="tType">
+      <option>Solo</option>
+      <option>Duo</option>
+      <option>Squad</option>
+    </select>
+
+    <label>Entry Type</label>
+    <select id="tEntry">
+      <option>FREE ENTRY</option>
+      <option>PAID ENTRY</option>
+    </select>
+
+    <label>Tag</label>
+    <input id="tTag" placeholder="UPCOMING">
+
+    <label>Prize</label>
+    <input id="tPrize" type="number" min="0" placeholder="300">
+
+    <label>Match Date & Time</label>
+    <input id="tTime" type="datetime-local">
+
+    <label>Status</label>
+    <select id="tStatus">
+      <option value="upcoming">Upcoming</option>
+      <option value="live">Live</option>
+      <option value="completed">Completed</option>
+      <option value="cancelled">Cancelled</option>
+    </select>
+
+    <label>Room ID</label>
+    <input id="tRoomId" placeholder="Room ID">
+
+    <label>Room Password</label>
+    <input id="tRoomPassword" placeholder="Room Password">
+
+    <label>Live URL</label>
+    <input id="tLiveUrl" placeholder="https://youtube.com/...">
+
+    <label>Registration</label>
+    <select id="tRegistration">
+      <option value="true">Open</option>
+      <option value="false">Closed</option>
+    </select>
+
+    <label>Show Room Details</label>
+    <select id="tRoomVisible">
+      <option value="false">Hidden</option>
+      <option value="true">Visible</option>
+    </select>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" onclick="closeTournamentModal()">Cancel</button>
+      <button class="save-btn" onclick="saveTournament()">Save Tournament</button>
     </div>
 
+    <div class="message" id="tournamentMessage"></div>
+
   </div>
+
+</div>
+
 
 <script>
 
 const SUPABASE_URL =
-  "https://aakdbugxtftyhdfyxyfr.supabase.co";
+"https://aakdbugxtftyhdfyxyfr.supabase.co";
 
 const SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_pUMWE4y0iNycqs5i7c-bcQ_T4o8kI58";
+"sb_publishable_pUMWE4y0iNycqs5i7c-bcQ_T4o8kI58";
 
-const supabaseClient = window.supabase.createClient(
+const supabaseClient =
+window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY
 );
 
 
-async function login() {
+let tournaments = [];
+
+
+/* LOGIN */
+
+async function login(){
 
   const email =
     document.getElementById("email").value.trim();
@@ -151,64 +647,613 @@ async function login() {
   const password =
     document.getElementById("password").value;
 
-  const message =
+  const msg =
     document.getElementById("loginMessage");
 
-  message.textContent = "Logging in...";
+  msg.textContent="Logging in...";
 
-  if (!email || !password) {
-    message.textContent = "Email और password डालो.";
+  if(!email || !password){
+    msg.textContent="Email और password डालो.";
     return;
   }
 
-  const { data, error } =
+  const {data,error} =
     await supabaseClient.auth.signInWithPassword({
-      email: email,
-      password: password
+      email,
+      password
     });
 
-  if (error) {
-    message.textContent =
-      "Login failed: " + error.message;
+  if(error){
+    msg.textContent="Login failed: "+error.message;
     return;
   }
 
-  const user = data.user;
+  const user=data.user;
 
-  const { data: admin, error: adminError } =
+  const {data:admin,error:adminError} =
     await supabaseClient
       .from("admins")
       .select("user_id")
-      .eq("user_id", user.id)
+      .eq("user_id",user.id)
       .maybeSingle();
 
-  if (adminError || !admin) {
+  if(adminError || !admin){
 
     await supabaseClient.auth.signOut();
 
-    message.textContent =
-      "यह account admin नहीं है.";
+    msg.textContent="यह account admin नहीं है.";
 
     return;
   }
 
-  document.getElementById("loginBox").style.display = "none";
-  document.getElementById("dashboard").style.display = "block";
+  document.getElementById("loginBox").style.display="none";
+  document.getElementById("dashboard").style.display="block";
 
   document.getElementById("welcome").textContent =
-    "Welcome, Admin 👋 " + user.email;
+    "Welcome, Admin 👋 "+user.email;
+
+  await loadAll();
+
 }
 
 
-async function logout() {
+/* LOGOUT */
+
+async function logout(){
 
   await supabaseClient.auth.signOut();
 
-  document.getElementById("dashboard").style.display = "none";
-  document.getElementById("loginBox").style.display = "block";
+  location.reload();
 
-  document.getElementById("password").value = "";
 }
+
+
+/* NAVIGATION */
+
+function showSection(id,button){
+
+  document.querySelectorAll(".section")
+    .forEach(x=>x.classList.remove("active"));
+
+  document.getElementById(id)
+    .classList.add("active");
+
+  document.querySelectorAll(".nav button")
+    .forEach(x=>x.classList.remove("active"));
+
+  button.classList.add("active");
+
+  if(id==="playersSection"){
+    loadPlayers();
+  }
+
+}
+
+
+/* LOAD EVERYTHING */
+
+async function loadAll(){
+
+  await loadTournaments();
+  await loadPlayers();
+
+}
+
+
+/* LOAD TOURNAMENTS */
+
+async function loadTournaments(){
+
+  const {data,error} =
+    await supabaseClient
+      .from("tournaments")
+      .select("*")
+      .order("match_time",{ascending:true});
+
+  if(error){
+
+    alert("Tournament loading error: "+error.message);
+
+    return;
+  }
+
+  tournaments=data || [];
+
+  document.getElementById("totalTournaments")
+    .textContent=tournaments.length;
+
+  document.getElementById("upcomingCount")
+    .textContent=
+      tournaments.filter(x=>x.status==="upcoming").length;
+
+  document.getElementById("liveCount")
+    .textContent=
+      tournaments.filter(x=>x.status==="live").length;
+
+  renderTournaments();
+  renderRecent();
+
+}
+
+
+/* RENDER TOURNAMENT TABLE */
+
+function renderTournaments(){
+
+  const table =
+    document.getElementById("tournamentTable");
+
+  if(!tournaments.length){
+
+    table.innerHTML =
+      '<tr><td colspan="8" class="empty">No tournaments found.</td></tr>';
+
+    return;
+  }
+
+  table.innerHTML =
+    tournaments.map(t=>{
+
+      const date =
+        t.match_time
+        ? new Date(t.match_time).toLocaleString()
+        : "-";
+
+      return `
+        <tr>
+
+          <td><strong>${escapeHtml(t.name)}</strong></td>
+
+          <td>${escapeHtml(t.map)}</td>
+
+          <td>${escapeHtml(t.match_type)}</td>
+
+          <td>₹${Number(t.prize || 0).toLocaleString()}</td>
+
+          <td>${date}</td>
+
+          <td>
+            <span class="badge ${t.status}">
+              ${t.status}
+            </span>
+          </td>
+
+          <td>
+            ${t.registration_open ? "🟢 Open" : "🔴 Closed"}
+          </td>
+
+          <td>
+            <button class="action edit"
+              onclick="editTournament(${t.id})">
+              Edit
+            </button>
+
+            <button class="action delete"
+              onclick="deleteTournament(${t.id})">
+              Delete
+            </button>
+          </td>
+
+        </tr>
+      `;
+
+    }).join("");
+
+}
+
+
+/* RECENT */
+
+function renderRecent(){
+
+  const box =
+    document.getElementById("recentTournaments");
+
+  if(!tournaments.length){
+
+    box.innerHTML =
+      '<div class="empty">No tournaments yet.</div>';
+
+    return;
+  }
+
+  box.innerHTML =
+    tournaments.slice(0,5).map(t=>`
+
+      <div style="
+        padding:13px 0;
+        border-bottom:1px solid #263248;
+      ">
+
+        <strong>${escapeHtml(t.name)}</strong>
+
+        <div style="color:#94a3b8;margin-top:5px">
+          ${escapeHtml(t.match_type)}
+          • ${escapeHtml(t.map)}
+          • ₹${Number(t.prize || 0).toLocaleString()}
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+/* MODAL OPEN */
+
+function openTournamentModal(){
+
+  document.getElementById("modalTitle")
+    .textContent="Add Tournament";
+
+  document.getElementById("tournamentId").value="";
+
+  document.getElementById("tName").value="";
+  document.getElementById("tMap").value="Erangel";
+  document.getElementById("tType").value="Solo";
+  document.getElementById("tEntry").value="FREE ENTRY";
+  document.getElementById("tTag").value="UPCOMING";
+  document.getElementById("tPrize").value="0";
+  document.getElementById("tTime").value="";
+  document.getElementById("tStatus").value="upcoming";
+  document.getElementById("tRoomId").value="";
+  document.getElementById("tRoomPassword").value="";
+  document.getElementById("tLiveUrl").value="";
+  document.getElementById("tRegistration").value="true";
+  document.getElementById("tRoomVisible").value="false";
+  document.getElementById("tournamentMessage").textContent="";
+
+  document.getElementById("tournamentModal")
+    .style.display="flex";
+
+}
+
+
+/* CLOSE MODAL */
+
+function closeTournamentModal(){
+
+  document.getElementById("tournamentModal")
+    .style.display="none";
+
+}
+
+
+/* EDIT */
+
+function editTournament(id){
+
+  const t =
+    tournaments.find(x=>x.id===id);
+
+  if(!t) return;
+
+  document.getElementById("modalTitle")
+    .textContent="Edit Tournament";
+
+  document.getElementById("tournamentId").value=t.id;
+
+  document.getElementById("tName").value=t.name || "";
+  document.getElementById("tMap").value=t.map || "Erangel";
+  document.getElementById("tType").value=t.match_type || "Solo";
+  document.getElementById("tEntry").value=t.entry_type || "FREE ENTRY";
+  document.getElementById("tTag").value=t.tag || "UPCOMING";
+  document.getElementById("tPrize").value=t.prize || 0;
+
+  if(t.match_time){
+
+    const d=new Date(t.match_time);
+
+    const local =
+      new Date(
+        d.getTime()-d.getTimezoneOffset()*60000
+      ).toISOString().slice(0,16);
+
+    document.getElementById("tTime").value=local;
+
+  }else{
+
+    document.getElementById("tTime").value="";
+
+  }
+
+  document.getElementById("tStatus").value=t.status || "upcoming";
+
+  document.getElementById("tRoomId").value=t.room_id || "";
+  document.getElementById("tRoomPassword").value=t.room_password || "";
+  document.getElementById("tLiveUrl").value=t.live_url || "";
+
+  document.getElementById("tRegistration").value =
+    String(t.registration_open);
+
+  document.getElementById("tRoomVisible").value =
+    String(t.room_visible);
+
+  document.getElementById("tournamentMessage").textContent="";
+
+  document.getElementById("tournamentModal")
+    .style.display="flex";
+
+}
+
+
+/* SAVE */
+
+async function saveTournament(){
+
+  const message =
+    document.getElementById("tournamentMessage");
+
+  message.textContent="Saving...";
+
+  const id =
+    document.getElementById("tournamentId").value;
+
+  const name =
+    document.getElementById("tName").value.trim();
+
+  if(!name){
+
+    message.textContent="Tournament name जरूरी है.";
+
+    return;
+  }
+
+  const timeValue =
+    document.getElementById("tTime").value;
+
+  const payload={
+
+    name:name,
+
+    map:document.getElementById("tMap").value,
+
+    match_type:document.getElementById("tType").value,
+
+    entry_type:document.getElementById("tEntry").value,
+
+    tag:document.getElementById("tTag").value.trim() || "UPCOMING",
+
+    prize:Number(document.getElementById("tPrize").value || 0),
+
+    match_time:timeValue
+      ? new Date(timeValue).toISOString()
+      : null,
+
+    status:document.getElementById("tStatus").value,
+
+    room_id:document.getElementById("tRoomId").value.trim() || null,
+
+    room_password:
+      document.getElementById("tRoomPassword").value.trim() || null,
+
+    room_visible:
+      document.getElementById("tRoomVisible").value==="true",
+
+    registration_open:
+      document.getElementById("tRegistration").value==="true",
+
+    live_url:
+      document.getElementById("tLiveUrl").value.trim() || null,
+
+    updated_at:new Date().toISOString()
+
+  };
+
+
+  let result;
+
+  if(id){
+
+    result =
+      await supabaseClient
+        .from("tournaments")
+        .update(payload)
+        .eq("id",id);
+
+  }else{
+
+    result =
+      await supabaseClient
+        .from("tournaments")
+        .insert(payload);
+
+  }
+
+
+  if(result.error){
+
+    message.textContent =
+      "Error: "+result.error.message;
+
+    return;
+  }
+
+
+  message.textContent="✅ Saved successfully.";
+
+  await loadTournaments();
+
+  setTimeout(
+    closeTournamentModal,
+    700
+  );
+
+}
+
+
+/* DELETE */
+
+async function deleteTournament(id){
+
+  const t =
+    tournaments.find(x=>x.id===id);
+
+  if(!t) return;
+
+  if(!confirm(
+    'Delete "'+t.name+'"?'
+  )) return;
+
+
+  const {error} =
+    await supabaseClient
+      .from("tournaments")
+      .delete()
+      .eq("id",id);
+
+
+  if(error){
+
+    alert("Delete failed: "+error.message);
+
+    return;
+  }
+
+
+  await loadTournaments();
+
+}
+
+
+/* LOAD PLAYERS */
+
+async function loadPlayers(){
+
+  const table =
+    document.getElementById("playersTable");
+
+  const {data,error} =
+    await supabaseClient
+      .from("registrations")
+      .select("*")
+      .order("registered_at",{ascending:false});
+
+
+  if(error){
+
+    table.innerHTML =
+      `<tr>
+        <td colspan="6" class="empty">
+          Unable to load registrations.
+        </td>
+      </tr>`;
+
+    return;
+  }
+
+
+  const players=data || [];
+
+  document.getElementById("totalRegistrations")
+    .textContent=players.length;
+
+
+  if(!players.length){
+
+    table.innerHTML =
+      `<tr>
+        <td colspan="6" class="empty">
+          No registrations found.
+        </td>
+      </tr>`;
+
+    return;
+  }
+
+
+  table.innerHTML =
+    players.map(p=>{
+
+      const tournament =
+        tournaments.find(
+          t=>t.id===p.tournament_id
+        );
+
+      const date =
+        p.registered_at
+        ? new Date(p.registered_at).toLocaleString()
+        : "-";
+
+
+      return `
+        <tr>
+
+          <td>${escapeHtml(p.player_name || "-")}</td>
+
+          <td>${escapeHtml(p.bgmi_uid || "-")}</td>
+
+          <td>${escapeHtml(p.phone || "-")}</td>
+
+          <td>
+            ${tournament
+              ? escapeHtml(tournament.name)
+              : escapeHtml(p.match_name || "-")}
+          </td>
+
+          <td>${escapeHtml(p.status || "registered")}</td>
+
+          <td>${date}</td>
+
+        </tr>
+      `;
+
+    }).join("");
+
+}
+
+
+/* ESCAPE HTML */
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* SESSION CHECK */
+
+async function checkSession(){
+
+  const {data} =
+    await supabaseClient.auth.getSession();
+
+  if(data.session){
+
+    const user=data.session.user;
+
+    const {data:admin} =
+      await supabaseClient
+        .from("admins")
+        .select("user_id")
+        .eq("user_id",user.id)
+        .maybeSingle();
+
+    if(admin){
+
+      document.getElementById("loginBox").style.display="none";
+      document.getElementById("dashboard").style.display="block";
+
+      document.getElementById("welcome").textContent =
+        "Welcome, Admin 👋 "+user.email;
+
+      await loadAll();
+
+    }
+
+  }
+
+}
+
+
+checkSession();
 
 </script>
 
